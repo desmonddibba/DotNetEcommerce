@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Webshop.Services.CartAPI.Data;
+using Webshop.Services.CartAPI.Extensions;
 using Webshop.Services.CartAPI.Service;
 using Webshop.Services.CartAPI.Service.IService;
 
@@ -16,20 +17,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Httpclient
+
+// Httpclient for cart & couponservice
 builder.Services.AddHttpClient("Product", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrl:ProductAPI"]);
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]);
 });
 
 builder.Services.AddHttpClient("Coupon", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrl:CouponAPI"]);
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]);
 });
+
 
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+
+builder.AddAppAuthentication();
 
 
 // Controller

@@ -60,7 +60,7 @@ namespace Webshop.Services.CartAPI.Controllers
                     if(coupon != null && cart.CartHeader.CartTotal > coupon.MinAmount)
                     {
                         cart.CartHeader.CartTotal -= coupon.DiscountAmount;
-                        cart.CartHeader.Discound = coupon.DiscountAmount;
+                        cart.CartHeader.Discount = coupon.DiscountAmount;
                     }
                 }
 

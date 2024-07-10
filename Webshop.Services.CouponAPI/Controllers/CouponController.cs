@@ -7,7 +7,6 @@ using Webshop.Services.CouponAPI.Models;
 
 namespace Webshop.Services.CouponAPI.Controllers
 {
-    [Authorize]
     [Route("api/coupon")]
 	[ApiController]
 	public class ProductController : ControllerBase

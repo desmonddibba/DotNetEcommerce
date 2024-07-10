@@ -18,7 +18,7 @@ namespace Webshop.Web.Controllers
         }
 
 
-       //[Authorize]
+        [Authorize]
         public async Task<IActionResult> CartIndex()
         {
             return View();

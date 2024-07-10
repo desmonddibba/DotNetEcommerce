@@ -11,7 +11,7 @@ namespace Webshop.Services.CartAPI.Models
         public string? CouponCode { get; set; }
 
         [NotMapped]
-        public decimal Discound { get; set; }
+        public decimal Discount { get; set; }
         [NotMapped]
         public decimal CartTotal { get; set; }
     }
