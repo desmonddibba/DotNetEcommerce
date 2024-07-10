@@ -22,7 +22,7 @@ namespace Webshop.Services.CartAPI.Service
 
             var res = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
 
-            if (res.IsSuccess)
+            if (res!= null && res.IsSuccess)
             {
                 return JsonConvert.DeserializeObject<CouponDto>(Convert.ToString(res.Result));
             }

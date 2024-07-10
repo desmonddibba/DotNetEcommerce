@@ -15,15 +15,13 @@ namespace Webshop.Web.Service
         }
 
 
-
-
         public async Task<ResponseDto?> ApplyCouponAsync(CartDto carDto)
         {
             return await _baseService.SendAsync(new RequestDto()
             {
                 ApiType = SD.ApiType.POST,
                 Data = carDto,
-                Url = SD.CouponAPIBase + "/api/cart/ApplyCoupon"
+                Url = SD.CartAPIBase + "/api/cart/ApplyCoupon"
             });
 
         }
@@ -34,17 +32,17 @@ namespace Webshop.Web.Service
             {
                 ApiType = SD.ApiType.GET,
                 Data = userId,
-                Url = SD.CouponAPIBase + "/api/cart/GetCart/" +userId
+                Url = SD.CartAPIBase + "/api/cart/GetCart/" + userId
             }); 
         }
 
-        public async Task<ResponseDto?> RemovFromCartASync(int cartDetailsId)
+        public async Task<ResponseDto?> RemoveFromCartASync(int cartDetailsId)
         {
             return await _baseService.SendAsync(new RequestDto()
             {
                 ApiType = SD.ApiType.POST,
                 Data = cartDetailsId,
-                Url = SD.CouponAPIBase + "/api/cart/RemoveCart"
+                Url = SD.CartAPIBase + "/api/cart/RemoveCart"
             });
         }
 
@@ -54,7 +52,7 @@ namespace Webshop.Web.Service
             {
                 ApiType = SD.ApiType.POST,
                 Data = carDto,
-                Url = SD.CouponAPIBase + "/api/cart/CartUpsert"
+                Url = SD.CartAPIBase + "/api/cart/CartUpsert"
             });
         }
     }

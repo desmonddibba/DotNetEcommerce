@@ -3,44 +3,45 @@ using Webshop.Services.CartAPI.Data;
 using Webshop.Services.CartAPI.Extensions;
 using Webshop.Services.CartAPI.Service;
 using Webshop.Services.CartAPI.Service.IService;
+using Webshop.Services.CartAPI.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Connection set up
-
+// Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
 // Mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Authentication Handler
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
 
 // Httpclient for cart & couponservice
 builder.Services.AddHttpClient("Product", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]);
-});
+}).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 
 builder.Services.AddHttpClient("Coupon", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]);
-});
-
-
+}).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 
+// App Authentication
 builder.AddAppAuthentication();
-
 
 // Controller
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -61,7 +62,6 @@ app.MapControllers();
 ApplyMigration();
 
 app.Run();
-
 
 void ApplyMigration()
 {

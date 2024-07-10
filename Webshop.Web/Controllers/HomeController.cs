@@ -1,4 +1,5 @@
 using IdentityModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -41,6 +42,7 @@ namespace Webshop.Web.Controllers
             return View(list);
         }
 
+        [Authorize]
         public async Task<IActionResult> ProductDetails(int productId)
         {
             ProductDto? model = new();
@@ -58,6 +60,7 @@ namespace Webshop.Web.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpPost]
         [ActionName("ProductDetails")]
         public async Task<IActionResult> ProductDetails(ProductDto productDto)
@@ -70,15 +73,15 @@ namespace Webshop.Web.Controllers
                 }
             };
 
+
             CartDetailsDto cartDetailsDto = new CartDetailsDto()
             {
                 Count = productDto.Count,
-                ProductId = productDto.ProductId,
+                ProductId = productDto.ProductId
             };
 
             List<CartDetailsDto> cartDetailsDtos = new() { cartDetailsDto };
             cartDto.CartDetails = cartDetailsDtos;
-
 
             ResponseDto? response = await _cartService.UpsertCartAsync(cartDto);
 

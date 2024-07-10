@@ -9,6 +9,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 {
     [Route("api/coupon")]
 	[ApiController]
+	[Authorize]
 	public class ProductController : ControllerBase
 	{
 		private readonly ICouponRepository _couponRepo;

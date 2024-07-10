@@ -15,13 +15,15 @@ namespace Webshop.Web.Controllers
 {
 	public class AuthController : Controller
 	{
-		private readonly IAuthService _authservice;
-        private readonly ITokenProvider _tokenprovider;
+		private readonly IAuthService _authService;
+        private readonly ITokenProvider _tokenProvider;
+        private readonly ILogger<AuthController> _logger;
 
-		public AuthController(IAuthService authService, ITokenProvider tokenProvider)
+		public AuthController(IAuthService authService, ITokenProvider tokenProvider, ILogger<AuthController> logger)
         {
-			_authservice = authService;
-            _tokenprovider = tokenProvider;
+            _authService = authService;
+            _tokenProvider = tokenProvider;
+            _logger = logger;
         }
 
 		[HttpGet]
@@ -30,31 +32,28 @@ namespace Webshop.Web.Controllers
 			LoginRequestDto loginRequestDto = new();
 			return View(loginRequestDto);
 		}
+
+
         [HttpPost]
-        public async Task<IActionResult> Login(LoginRequestDto loginReq)
+        public async Task<IActionResult> Login(LoginRequestDto loginRequest)
         {
-            ResponseDto response = await _authservice.LoginAsync(loginReq);
+            ResponseDto response = await _authService.LoginAsync(loginRequest);
 
             if (response != null && response.IsSuccess)
             {
                 LoginResponseDto loginResponse = JsonConvert.DeserializeObject<LoginResponseDto>(Convert.ToString(response.Result));
-
-                // Set Jwt Token
                 await SignInUser(loginResponse);
-                _tokenprovider.SetToken(loginResponse.Token);
+
+                _tokenProvider.SetToken(loginResponse.Token);
 
                 return RedirectToAction("Index", "Home");
             }
             else
             {
                 ModelState.AddModelError("CustomError", response.Message);
-                return View(loginReq);
+                return View(loginRequest);
             }
         }
-
-
-
-
 
 
         [HttpGet]
@@ -72,7 +71,7 @@ namespace Webshop.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegistrationRequestDto regRequest)
         {
-			ResponseDto response = await _authservice.RegisterAsync(regRequest);
+			ResponseDto response = await _authService.RegisterAsync(regRequest);
 			ResponseDto assignRole;
 		
 			if(response != null && response.IsSuccess)
@@ -81,7 +80,7 @@ namespace Webshop.Web.Controllers
 				{
 					regRequest.Role = SD.RoleCustomer;
                 }
-                assignRole = await _authservice.AssignRoleAsync(regRequest);
+                assignRole = await _authService.AssignRoleAsync(regRequest);
 
 				if(assignRole != null && assignRole.IsSuccess)
 				{
@@ -113,7 +112,7 @@ namespace Webshop.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
-            _tokenprovider.ClearToken();
+            _tokenProvider.ClearToken();
             return RedirectToAction("Index", "Home");
         }
 
@@ -125,7 +124,7 @@ namespace Webshop.Web.Controllers
 
             var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, 
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email,
                 jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
             identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub,
                 jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value));
@@ -141,6 +140,11 @@ namespace Webshop.Web.Controllers
 
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+            _logger.LogInformation("User signed in and token set in HttpContext.");
+
         }
+
+
     }
 }
