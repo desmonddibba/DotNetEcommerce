@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -13,26 +12,25 @@ using Webshop.Web.Utility;
 
 namespace Webshop.Web.Controllers
 {
-	public class AuthController : Controller
-	{
-		private readonly IAuthService _authService;
+    public class AuthController : Controller
+    {
+        private readonly IAuthService _authService;
         private readonly ITokenProvider _tokenProvider;
         private readonly ILogger<AuthController> _logger;
 
-		public AuthController(IAuthService authService, ITokenProvider tokenProvider, ILogger<AuthController> logger)
+        public AuthController(IAuthService authService, ITokenProvider tokenProvider, ILogger<AuthController> logger)
         {
             _authService = authService;
             _tokenProvider = tokenProvider;
             _logger = logger;
         }
 
-		[HttpGet]
-		public IActionResult Login()
-		{
-			LoginRequestDto loginRequestDto = new();
-			return View(loginRequestDto);
-		}
-
+        [HttpGet]
+        public IActionResult Login()
+        {
+            LoginRequestDto loginRequestDto = new();
+            return View(loginRequestDto);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginRequestDto loginRequest)
@@ -43,9 +41,8 @@ namespace Webshop.Web.Controllers
             {
                 LoginResponseDto loginResponse = JsonConvert.DeserializeObject<LoginResponseDto>(Convert.ToString(response.Result));
                 await SignInUser(loginResponse);
-
                 _tokenProvider.SetToken(loginResponse.Token);
-
+                _logger.LogInformation("Token set in cookies: {Token}", loginResponse.Token);
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -55,38 +52,37 @@ namespace Webshop.Web.Controllers
             }
         }
 
-
         [HttpGet]
-		public IActionResult Register()
-		{
-			var roleList = new List<SelectListItem>()
-			{
-				new SelectListItem{Text=SD.RoleAdmin, Value=SD.RoleAdmin},
-                new SelectListItem{Text=SD.RoleCustomer, Value=SD.RoleCustomer}
+        public IActionResult Register()
+        {
+            var roleList = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = SD.RoleAdmin, Value = SD.RoleAdmin },
+                new SelectListItem { Text = SD.RoleCustomer, Value = SD.RoleCustomer }
             };
-			ViewBag.RoleList = roleList;
-			return View();
-		}
+            ViewBag.RoleList = roleList;
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegistrationRequestDto regRequest)
         {
-			ResponseDto response = await _authService.RegisterAsync(regRequest);
-			ResponseDto assignRole;
-		
-			if(response != null && response.IsSuccess)
-			{
-				if(string.IsNullOrEmpty(regRequest.Role))
-				{
-					regRequest.Role = SD.RoleCustomer;
+            ResponseDto response = await _authService.RegisterAsync(regRequest);
+            ResponseDto assignRole;
+
+            if (response != null && response.IsSuccess)
+            {
+                if (string.IsNullOrEmpty(regRequest.Role))
+                {
+                    regRequest.Role = SD.RoleCustomer;
                 }
                 assignRole = await _authService.AssignRoleAsync(regRequest);
 
-				if(assignRole != null && assignRole.IsSuccess)
-				{
-					TempData["success"] = "Registration Successful";
-					return RedirectToAction(nameof(Login));
-				}
+                if (assignRole != null && assignRole.IsSuccess)
+                {
+                    TempData["success"] = "Registration Successful";
+                    return RedirectToAction(nameof(Login));
+                }
             }
             else
             {
@@ -95,27 +91,21 @@ namespace Webshop.Web.Controllers
 
             var roleList = new List<SelectListItem>()
             {
-                new SelectListItem{Text=SD.RoleAdmin, Value=SD.RoleAdmin},
-                new SelectListItem{Text=SD.RoleCustomer, Value=SD.RoleCustomer}
+                new SelectListItem { Text = SD.RoleAdmin, Value = SD.RoleAdmin },
+                new SelectListItem { Text = SD.RoleCustomer, Value = SD.RoleCustomer }
             };
             ViewBag.RoleList = roleList;
             return View(regRequest);
-       }
-
-
-
-
-
-
+        }
 
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
             _tokenProvider.ClearToken();
+            _logger.LogInformation("User logged out and token cleared from cookies.");
             return RedirectToAction("Index", "Home");
         }
-
 
         private async Task SignInUser(LoginResponseDto loginResponse)
         {
@@ -123,28 +113,15 @@ namespace Webshop.Web.Controllers
             var jwt = handler.ReadJwtToken(loginResponse.Token);
 
             var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email,
-                jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
-            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub,
-                jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value));
-            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name,
-                jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Name).Value));
-
-
-            identity.AddClaim(new Claim(ClaimTypes.Name,
-                     jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
-
-            identity.AddClaim(new Claim(ClaimTypes.Role,
-                    jwt.Claims.FirstOrDefault(u => u.Type == "role").Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value));
+            identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Name).Value));
+            identity.AddClaim(new Claim(ClaimTypes.Name, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+            identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u => u.Type == "role").Value));
 
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            _logger.LogInformation("User signed in and token set in HttpContext.");
-
+            _logger.LogInformation("User signed in with claims: {Claims}", principal.Claims.Select(c => c.Type + ": " + c.Value));
         }
-
-
     }
 }

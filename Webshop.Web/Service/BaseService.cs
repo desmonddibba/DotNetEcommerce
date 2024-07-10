@@ -8,8 +8,6 @@ using Webshop.Web.Service.IService;
 using Webshop.Web.Utility;
 using static Webshop.Web.Utility.SD;
 using Webshop.Web.Dtos;
-using System.Net.Http.Headers;
-using System.Net.Mime;
 
 namespace Webshop.Web.Service
 {
@@ -17,16 +15,14 @@ namespace Webshop.Web.Service
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<BaseService> _logger;
-        private readonly ITokenProvider _tokenProvider;
 
-        public BaseService(IHttpClientFactory httpClientFactory, ILogger<BaseService> logger, ITokenProvider tokenProvider)
+        public BaseService(IHttpClientFactory httpClientFactory, ILogger<BaseService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
-            _tokenProvider = tokenProvider;
         }
 
-        public async Task<ResponseDto> SendAsync(RequestDto requestDto, bool withBearer = true)
+        public async Task<ResponseDto> SendAsync(RequestDto requestDto)
         {
             try
             {
@@ -35,22 +31,20 @@ namespace Webshop.Web.Service
                 HttpClient client = _httpClientFactory.CreateClient("WebshopAPI");
                 HttpRequestMessage message = new()
                 {
+                    Headers = { { "Accept", "application/json" } },
                     RequestUri = new Uri(requestDto.Url)
                 };
 
-                // Token handling
-                if (withBearer)
+                if (requestDto.ApiType != ApiType.GET && requestDto.Data != null)
                 {
-                    var token = _tokenProvider.GetToken();
-                    if (!string.IsNullOrEmpty(token))
-                    {
-                        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    }
+                    message.Content = new StringContent(
+                        JsonConvert.SerializeObject(requestDto.Data),
+                        Encoding.UTF8,
+                        "application/json");
                 }
 
+                HttpResponseMessage? apiResponse = null;
 
-
-                // Set HTTP method
                 switch (requestDto.ApiType)
                 {
                     case ApiType.POST:
@@ -67,7 +61,7 @@ namespace Webshop.Web.Service
                         break;
                 }
 
-                HttpResponseMessage apiResponse = await client.SendAsync(message);
+                apiResponse = await client.SendAsync(message);
 
                 if (apiResponse == null)
                 {
@@ -88,6 +82,7 @@ namespace Webshop.Web.Service
                     case HttpStatusCode.InternalServerError:
                         return new() { IsSuccess = false, Message = "Internal Server Error" };
                     default:
+
                         var apiContent = await apiResponse.Content.ReadAsStringAsync();
                         _logger.LogInformation("API response content: {Content}", apiContent);
 
