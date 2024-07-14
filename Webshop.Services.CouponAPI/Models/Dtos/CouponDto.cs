@@ -1,4 +1,4 @@
-﻿namespace Webshop.Services.CouponAPI.Dtos
+﻿namespace Webshop.Services.CouponAPI.Models.Dtos
 {
     public class CouponDto
     {

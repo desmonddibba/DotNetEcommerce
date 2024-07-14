@@ -1,186 +1,89 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Webshop.Services.CouponAPI.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
 using Webshop.Services.CouponAPI.Interface;
-using Webshop.Services.CouponAPI.Models;
+using Webshop.Services.CouponAPI.Models.Dtos;
+using Webshop.Services.CouponAPI.Repository;
 
 namespace Webshop.Services.CouponAPI.Controllers
 {
     [Route("api/coupon")]
-	[ApiController]
-	[Authorize]
-	public class CouponController : ControllerBase
-	{
-		private readonly ICouponRepository _couponRepo;
-		private readonly IMapper _mapper;
-		private ResponseDto _response;
+    [ApiController]
+    public class CouponController : ControllerBase
+    {
+        private readonly ICouponRepository _couponRepository;
+        protected ResponseDto _response;
 
-		public CouponController(ICouponRepository couponRepo, IMapper mapper)
-		{
-			_couponRepo = couponRepo;
-			_mapper = mapper;
-			_response = new ResponseDto();
-		}
+        public CouponController(ICouponRepository couponRepository)
+        {
+            _couponRepository = couponRepository;
+            _response = new ResponseDto();
+        }
 
-		[HttpGet]
-		public async Task<ResponseDto> GetAll()
-		{
-			try
-			{
-				var coupons = await _couponRepo.GetAllAsync();
+        [HttpGet("GetByCode/{code}")]
+        public async Task<object> GetByCode(string code)
+        {
+            try
+            {
+                var coupon = await _couponRepository.GetCouponByCode(code);
+                _response.Result = coupon;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string> { ex.ToString() };
+            }
+            return _response;
+        }
 
-				if (coupons == null || coupons.Count == 0)
-				{
-					_response.IsSuccess = false;
-					_response.Message = "No coupons found.";
-					return _response;
-				}
+        [HttpPost]
+        public async Task<object> CreateCoupon([FromBody] CouponDto couponDto)
+        {
+            try
+            {
+                var coupon = await _couponRepository.CreateUpdateCoupon(couponDto);
+                _response.Result = coupon;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string> { ex.ToString() };
+            }
+            return _response;
+        }
 
-				_response.Result = _mapper.Map<List<CouponDto>>(coupons);
-				_response.IsSuccess = true;
-			}
-			catch (Exception ex)
-			{
-				_response.IsSuccess = false;
-				_response.Message = ex.Message;
-			}
-			return _response;
-		}
+        [HttpPut]
+        public async Task<object> UpdateCoupon([FromBody] CouponDto couponDto)
+        {
+            try
+            {
+                var coupon = await _couponRepository.CreateUpdateCoupon(couponDto);
+                _response.Result = coupon;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string> { ex.ToString() };
+            }
+            return _response;
+        }
 
-		[HttpGet("{id:int}")]
-		public async Task<ResponseDto> GetById(int id)
-		{
-			try
-			{
-				var coupon = await _couponRepo.GetByIdAsync(id);
-				if (coupon == null)
-				{
-					_response.IsSuccess = false;
-					_response.Message = $"Coupon with id {id} not found.";
-					return _response;
-				}
-				_response.Result = _mapper.Map<CouponDto>(coupon);
-				_response.IsSuccess = true;
-			}
-			catch (Exception ex)
-			{
-				_response.IsSuccess = false;
-				_response.Message = ex.Message;
-			}
-			return _response;
-		}
-
-		[HttpGet("GetByCode/{code}")]
-		public async Task<ResponseDto> GetByCode(string code)
-		{
-			try
-			{
-				var coupon = await _couponRepo.GetByCodeAsync(code);
-				if (coupon == null)
-				{
-					_response.IsSuccess = false;
-					_response.Message = $"Coupon with code {code} not found.";
-					return _response;
-				}
-				_response.Result = _mapper.Map<CouponDto>(coupon);
-				_response.IsSuccess = true;
-			}
-			catch (Exception ex)
-			{
-				_response.IsSuccess = false;
-				_response.Message = ex.Message;
-			}
-			return _response;
-		}
-
-
-		[HttpPost]
-		[Authorize(Roles = "ADMIN")]
-		public async Task<ResponseDto> CreateCoupon([FromBody] CouponDto couponDto)
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					_response.IsSuccess = false;
-					_response.Message = "Invalid model state.";
-					return _response;
-				}
-
-
-				var coupon = _mapper.Map<Coupon>(couponDto);
-				await _couponRepo.CreateAsync(coupon);
-				_response.Result = _mapper.Map<CouponDto>(coupon);
-				_response.IsSuccess = true;
-			}
-			catch (Exception ex)
-			{
-				_response.IsSuccess = false;
-				_response.Message = ex.Message;
-			}
-			return _response;
-		}
-
-
-		[HttpDelete("{id:int}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<ResponseDto> DeleteCoupon(int id)
-		{
-			try
-			{
-				var coupon = await _couponRepo.DeleteAsync(id);
-				if (coupon == null)
-				{
-					_response.IsSuccess = false;
-					_response.Message = $"Coupon with id {id} not found.";
-					return _response;
-				}
-				_response.IsSuccess = true;
-				_response.Message = "Coupon deleted successfully.";
-			}
-			catch (Exception ex)
-			{
-				_response.IsSuccess = false;
-				_response.Message = ex.Message;
-			}
-			return _response;
-		}
-
-		[HttpPut("{id:int}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<ResponseDto> UpdateCoupon(int id, [FromBody] CouponDto updateDto)
-		{
-			try
-			{
-				if (!ModelState.IsValid)
-				{
-					_response.IsSuccess = false;
-					_response.Message = "Invalid model state.";
-					return _response;
-				}
-
-				var coupon = _mapper.Map<Coupon>(updateDto);
-				coupon.CouponId = id;
-
-				var updatedCoupon = await _couponRepo.UpdateAsync(coupon);
-
-				if (updatedCoupon == null)
-				{
-					_response.IsSuccess = false;
-					_response.Message = $"Coupon with id {id} not found.";
-					return _response;
-				}
-
-				_response.Result = _mapper.Map<CouponDto>(updatedCoupon);
-				_response.IsSuccess = true;
-			}
-			catch (Exception ex)
-			{
-				_response.IsSuccess = false;
-				_response.Message = ex.Message;
-			}
-			return _response;
-		}
-	}
+        [HttpDelete("{id}")]
+        public async Task<object> DeleteCoupon(int id)
+        {
+            try
+            {
+                var isDeleted = await _couponRepository.DeleteCoupon(id);
+                _response.Result = isDeleted;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages = new List<string> { ex.ToString() };
+            }
+            return _response;
+        }
+    }
 }

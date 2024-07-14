@@ -1,73 +1,61 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
 using Webshop.Services.CouponAPI.Data;
-using Webshop.Services.CouponAPI.Dtos;
-using Webshop.Services.CouponAPI.Interface;
 using Webshop.Services.CouponAPI.Models;
+using Webshop.Services.CouponAPI.Models.Dtos;
+using Microsoft.EntityFrameworkCore;
+using Webshop.Services.CouponAPI.Interface;
 
 namespace Webshop.Services.CouponAPI.Repository
 {
     public class CouponRepository : ICouponRepository
     {
-        private readonly AppDbContext _context;
-        public CouponRepository(AppDbContext context)
+        private readonly AppDbContext _db;
+        private IMapper _mapper;
+
+        public CouponRepository(AppDbContext db, IMapper mapper)
         {
-            _context = context;
+            _db = db;
+            _mapper = mapper;
         }
 
-        public async Task<Coupon> CreateAsync(Coupon coupon)
+        public async Task<CouponDto> GetCouponByCode(string couponCode)
         {
-            await _context.Coupons.AddAsync(coupon);
-            await _context.SaveChangesAsync();
-            return coupon;
+            var coupon = await _db.Coupons.FirstOrDefaultAsync(c => c.CouponCode == couponCode);
+            return _mapper.Map<CouponDto>(coupon);
         }
 
-        public async Task<Coupon?> DeleteAsync(int CouponId)
+        public async Task<CouponDto> CreateUpdateCoupon(CouponDto couponDto)
         {
-            var coupon = await _context.Coupons.FirstOrDefaultAsync(x => x.CouponId == CouponId);
-
-            if (coupon == null)
+            var coupon = _mapper.Map<Coupon>(couponDto);
+            if (coupon.CouponId > 0)
             {
-                return null;
+                _db.Coupons.Update(coupon);
             }
-
-            _context.Coupons.Remove(coupon);
-            await _context.SaveChangesAsync();
-            return coupon;
-
-        }
-
-        public async Task<List<Coupon>> GetAllAsync()
-        {
-            return await _context.Coupons.ToListAsync();
-        }
-
-        public async Task<Coupon?> GetByCodeAsync(string code)
-        {
-            return await _context.Coupons.FirstOrDefaultAsync(x => x.CouponCode.ToLower() == code.ToLower());
-        }
-
-        public async Task<Coupon?> GetByIdAsync(int CouponId)
-        {
-            return await _context.Coupons.FirstOrDefaultAsync(x => x.CouponId == CouponId);
-        }
-
-        public async Task<Coupon?> UpdateAsync(Coupon coupon)
-        {
-            var existingCoupon = await _context.Coupons.FirstOrDefaultAsync(x => x.CouponId == coupon.CouponId);
-            if (existingCoupon == null)
+            else
             {
-                return null;
+                _db.Coupons.Add(coupon);
             }
+            await _db.SaveChangesAsync();
+            return _mapper.Map<CouponDto>(coupon);
+        }
 
-            existingCoupon.CouponCode = coupon.CouponCode;
-            existingCoupon.DiscountAmount = coupon.DiscountAmount;
-            existingCoupon.MinAmount = coupon.MinAmount;
-
-
-            await _context.SaveChangesAsync();
-            return coupon;
-
-
+        public async Task<bool> DeleteCoupon(int couponId)
+        {
+            try
+            {
+                var coupon = await _db.Coupons.FirstOrDefaultAsync(c => c.CouponId == couponId);
+                if (coupon == null)
+                {
+                    return false;
+                }
+                _db.Coupons.Remove(coupon);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
