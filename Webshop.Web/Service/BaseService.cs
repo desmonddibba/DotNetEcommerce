@@ -16,13 +16,14 @@ namespace Webshop.Web.Service
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<BaseService> _logger;
 
-        public BaseService(IHttpClientFactory httpClientFactory, ILogger<BaseService> logger)
+        public BaseService(IHttpClientFactory httpClientFactory,
+            ILogger<BaseService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
-        public async Task<ResponseDto> SendAsync(RequestDto requestDto)
+        public async Task<ResponseDto> SendAsync(RequestDto requestDto, bool withBearer = true)
         {
             try
             {
@@ -34,6 +35,20 @@ namespace Webshop.Web.Service
                     Headers = { { "Accept", "application/json" } },
                     RequestUri = new Uri(requestDto.Url)
                 };
+
+                // Add token to headers if withBearer is true
+                if (withBearer)
+                {
+                    var token = ""; // Replace this with the actual token retrieval logic
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        message.Headers.Add("Authorization", $"Bearer {token}");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Token is null or empty");
+                    }
+                }
 
                 if (requestDto.ApiType != ApiType.GET && requestDto.Data != null)
                 {
