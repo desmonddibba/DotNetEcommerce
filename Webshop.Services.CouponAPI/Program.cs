@@ -8,24 +8,19 @@ using Webshop.Services.CouponAPI.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Connection set up
-
+// DB Connection set up
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
-// Repository
-builder.Services.AddScoped<ICouponRepository, CouponRepository>();
-
-// Authentication
-builder.AddAppAuthentication();
 
 // Mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Controller
 builder.Services.AddControllers();
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -51,16 +46,23 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
+// Extensions -> WebApplicationBuilderExtension
+builder.AddAppAuthentication();
+
 
 builder.Services.AddAuthorization();
+
+
+
+// Repository
+builder.Services.AddScoped<ICouponRepository, CouponRepository>();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
-
 app.UseSwagger();
-app.UseSwaggerUI( c =>
+app.UseSwaggerUI(c =>
 {
     if (!app.Environment.IsDevelopment())
     {
@@ -80,16 +82,15 @@ app.MapControllers();
 
 // Migrate when program run
 ApplyMigration();
-
 app.Run();
 
 
 void ApplyMigration()
 {
-    using(var scope = app.Services.CreateScope())
+    using (var scope = app.Services.CreateScope())
     {
         var _db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if(_db.Database.GetPendingMigrations().Count() > 0)
+        if (_db.Database.GetPendingMigrations().Count() > 0)
         {
             _db.Database.Migrate();
         }

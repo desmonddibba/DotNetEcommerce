@@ -10,9 +10,7 @@ namespace Webshop.Services.CouponAPI.Profiles
         {
             // Src -> Target
 
-            CreateMap<Coupon, CouponReadDto>();
-            CreateMap<CouponCreateDto, Coupon>();
-            CreateMap<CouponUpdateDto, Coupon>();
+            CreateMap<Coupon, CouponDto>().ReverseMap();
         
         }
 

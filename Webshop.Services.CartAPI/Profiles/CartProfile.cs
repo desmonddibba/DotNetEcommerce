@@ -2,7 +2,7 @@
 using Webshop.Services.CartAPI.Models;
 using Webshop.Services.CartAPI.Models.Dtos;
 
-namespace Webshop.Services.CouponAPI.Profiles
+namespace Webshop.Services.CartAPI.Profiles
 {
     public class CartProfile : Profile
     {

@@ -16,13 +16,11 @@ namespace Webshop.Web.Controllers
     {
         private readonly IAuthService _authService;
         private readonly ITokenProvider _tokenProvider;
-        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService, ITokenProvider tokenProvider, ILogger<AuthController> logger)
+        public AuthController(IAuthService authService, ITokenProvider tokenProvider)
         {
             _authService = authService;
             _tokenProvider = tokenProvider;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -40,14 +38,16 @@ namespace Webshop.Web.Controllers
             if (response != null && response.IsSuccess)
             {
                 LoginResponseDto loginResponse = JsonConvert.DeserializeObject<LoginResponseDto>(Convert.ToString(response.Result));
+
+
                 await SignInUser(loginResponse);
                 _tokenProvider.SetToken(loginResponse.Token);
-                _logger.LogInformation("Token set in cookies: {Token}", loginResponse.Token);
+
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                ModelState.AddModelError("CustomError", response.Message);
+                TempData["error"] = response.Message;
                 return View(loginRequest);
             }
         }
@@ -63,6 +63,7 @@ namespace Webshop.Web.Controllers
             ViewBag.RoleList = roleList;
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Register(RegistrationRequestDto regRequest)
@@ -103,25 +104,37 @@ namespace Webshop.Web.Controllers
         {
             await HttpContext.SignOutAsync();
             _tokenProvider.ClearToken();
-            _logger.LogInformation("User logged out and token cleared from cookies.");
             return RedirectToAction("Index", "Home");
         }
+
+
+
 
         private async Task SignInUser(LoginResponseDto loginResponse)
         {
             var handler = new JwtSecurityTokenHandler();
+
             var jwt = handler.ReadJwtToken(loginResponse.Token);
 
             var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+
             identity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+
             identity.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value));
+
             identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Name).Value));
+
+
+
             identity.AddClaim(new Claim(ClaimTypes.Name, jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email).Value));
+
             identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u => u.Type == "role").Value));
+
+
 
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-            _logger.LogInformation("User signed in with claims: {Claims}", principal.Claims.Select(c => c.Type + ": " + c.Value));
+            
         }
     }
 }

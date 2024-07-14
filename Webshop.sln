@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webshop.Services.AuthAPI", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webshop.Services.ProductAPI", "Webshop.Services.ProductAPI\Webshop.Services.ProductAPI.csproj", "{FC3F1919-05E8-4094-8DE1-B68909EDB278}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webshop.Services.CartAPI", "Webshop.Services.Cart\Webshop.Services.CartAPI.csproj", "{FDBC7B1D-3CF1-4DE2-A287-EC7F0F86D079}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webshop.Services.CartAPI", "Webshop.Services.CartAPI\Webshop.Services.CartAPI.csproj", "{BC24E493-4881-4B01-9728-59A7DD605EBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +43,10 @@ Global
 		{FC3F1919-05E8-4094-8DE1-B68909EDB278}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC3F1919-05E8-4094-8DE1-B68909EDB278}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC3F1919-05E8-4094-8DE1-B68909EDB278}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FDBC7B1D-3CF1-4DE2-A287-EC7F0F86D079}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FDBC7B1D-3CF1-4DE2-A287-EC7F0F86D079}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FDBC7B1D-3CF1-4DE2-A287-EC7F0F86D079}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FDBC7B1D-3CF1-4DE2-A287-EC7F0F86D079}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC24E493-4881-4B01-9728-59A7DD605EBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC24E493-4881-4B01-9728-59A7DD605EBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC24E493-4881-4B01-9728-59A7DD605EBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC24E493-4881-4B01-9728-59A7DD605EBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,7 +56,7 @@ Global
 		{5365F534-DBBB-47C4-BF23-CEE2E583FE26} = {2CA5C8D6-4332-4D51-8064-83B9008206F0}
 		{DFDB1B7D-31EF-4F38-99BC-09A1965B23DF} = {ADA380BC-BD26-49AD-88B6-CEEB53F00033}
 		{FC3F1919-05E8-4094-8DE1-B68909EDB278} = {ADA380BC-BD26-49AD-88B6-CEEB53F00033}
-		{FDBC7B1D-3CF1-4DE2-A287-EC7F0F86D079} = {ADA380BC-BD26-49AD-88B6-CEEB53F00033}
+		{BC24E493-4881-4B01-9728-59A7DD605EBC} = {ADA380BC-BD26-49AD-88B6-CEEB53F00033}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FF8C54B9-CC10-4707-B32C-3DC652D6A29A}

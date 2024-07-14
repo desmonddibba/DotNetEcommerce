@@ -9,17 +9,20 @@ namespace Webshop.Services.AuthAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly ResponseDto _response = new ResponseDto();
+        protected ResponseDto _response;
 
         public AuthController(IAuthService authService)
         {
             _authService = authService;
+            _response = new ResponseDto();
         }
 
+        
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
         {
-            var errorMsg = await _authService.Register(model);
+
+            var errorMsg = await _authService.Register(model); 
             if (!string.IsNullOrEmpty(errorMsg))
             {
                 _response.IsSuccess = false;
@@ -29,10 +32,12 @@ namespace Webshop.Services.AuthAPI.Controllers
             return Ok(_response);
         }
 
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
         {
             var loginResponse = await _authService.Login(model);
+
             if (loginResponse.User == null)
             {
                 _response.IsSuccess = false;
@@ -47,7 +52,7 @@ namespace Webshop.Services.AuthAPI.Controllers
         [HttpPost("AssignRole")]
         public async Task<IActionResult> AssignRole([FromBody] RegistrationRequestDto model)
         {
-            var assignRoleSuccess = await _authService.AssignRole(model.Email, model.Role);
+            var assignRoleSuccess = await _authService.AssignRole(model.Email, model.Role.ToUpper());
             if (!assignRoleSuccess)
             {
                 _response.IsSuccess = false;

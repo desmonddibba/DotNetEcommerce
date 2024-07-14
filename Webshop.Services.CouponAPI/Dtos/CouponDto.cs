@@ -1,6 +1,6 @@
 ﻿namespace Webshop.Services.CouponAPI.Dtos
 {
-    public class CouponReadDto
+    public class CouponDto
     {
         public int CouponId { get; set; }
         public string CouponCode { get; set; } = string.Empty;

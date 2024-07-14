@@ -26,13 +26,7 @@ namespace Webshop.Web.Service
 
         public void SetToken(string token)
         {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            };
-            _contextAccessor.HttpContext?.Response.Cookies.Append(SD.TokenCookie, token, cookieOptions);
+            _contextAccessor.HttpContext?.Response.Cookies.Append(SD.TokenCookie, token);
         }
     }
 

@@ -20,7 +20,11 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
 
-// Httpclient for cart & couponservice
+// Product & Coupon Services
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
+
+// HttpClient for cart & coupon service
 builder.Services.AddHttpClient("Product", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]);
@@ -31,16 +35,13 @@ builder.Services.AddHttpClient("Coupon", client =>
     client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]);
 }).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICouponService, CouponService>();
-
-// App Authentication
-builder.AddAppAuthentication();
-
-// Controller
+// Add Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Authentication & Authorization
+builder.AddAppAuthentication();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -57,8 +58,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-// Migrate when program run
 ApplyMigration();
 
 app.Run();

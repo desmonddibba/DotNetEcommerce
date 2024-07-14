@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace Webshop.Services.CartAPI.Controllers
         private IMapper _mapper;
         private readonly AppDbContext _context;
         private IProductService _productService;
-        private ICouponService _couponService; 
+        private ICouponService _couponService;
 
 
         public CartController(AppDbContext context, IMapper mapper,
@@ -30,8 +31,6 @@ namespace Webshop.Services.CartAPI.Controllers
             this._response = new ResponseDto();
             _couponService = couponService;
         }
-
-
 
         [HttpGet("GetCart/{userId}")]
         public async Task<ResponseDto> GetCart(string userId)
@@ -47,17 +46,17 @@ namespace Webshop.Services.CartAPI.Controllers
 
                 IEnumerable<ProductDto> productDtos = await _productService.GetProducts();
 
-                foreach(var item in cart.CartDetails)
+                foreach (var item in cart.CartDetails)
                 {
                     item.Product = productDtos.FirstOrDefault(u => u.ProductId == item.ProductId);
                     cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
                 }
 
                 // apply coupon if any
-                if(!string.IsNullOrEmpty(cart.CartHeader.CouponCode))
+                if (!string.IsNullOrEmpty(cart.CartHeader.CouponCode))
                 {
                     CouponDto coupon = await _couponService.GetCoupon(cart.CartHeader.CouponCode);
-                    if(coupon != null && cart.CartHeader.CartTotal > coupon.MinAmount)
+                    if (coupon != null && cart.CartHeader.CartTotal > coupon.MinAmount)
                     {
                         cart.CartHeader.CartTotal -= coupon.DiscountAmount;
                         cart.CartHeader.Discount = coupon.DiscountAmount;
@@ -89,18 +88,18 @@ namespace Webshop.Services.CartAPI.Controllers
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false; 
+                _response.IsSuccess = false;
                 _response.Message = ex.ToString();
             }
             return _response;
         }
 
-  
+
 
 
 
         [HttpPost("CartUpsert")]
-        public async Task<ResponseDto> CartUpsert(CartDto cartDto) 
+        public async Task<ResponseDto> CartUpsert(CartDto cartDto)
         {
             // Handles adding first item to cart
             // Handles adding new item to cart with existing items 
@@ -111,7 +110,7 @@ namespace Webshop.Services.CartAPI.Controllers
                 var cartHeaderFromDb = await _context.CartHeaders.AsNoTracking()
                     .FirstOrDefaultAsync(u => u.UserId == cartDto.CartHeader.UserId);
 
-                if(cartHeaderFromDb == null)
+                if (cartHeaderFromDb == null)
                 {
                     // Create header & Details
                     CartHeader cartHeader = _mapper.Map<CartHeader>(cartDto.CartHeader);
@@ -125,9 +124,9 @@ namespace Webshop.Services.CartAPI.Controllers
                 {
                     // If header is not null create cart details
                     var cartDetailsFromDb = await _context.CartDetails.AsNoTracking().FirstOrDefaultAsync(
-                        u => u.ProductId == cartDto.CartDetails.First().ProductId && 
+                        u => u.ProductId == cartDto.CartDetails.First().ProductId &&
                         u.CartHeaderId == cartHeaderFromDb.CartHeaderId);
-                    if(cartDetailsFromDb == null)
+                    if (cartDetailsFromDb == null)
                     {
                         // Create cartDetails
                         cartDto.CartDetails.First().CartHeaderId = cartHeaderFromDb.CartHeaderId;
@@ -142,7 +141,7 @@ namespace Webshop.Services.CartAPI.Controllers
                         cartDto.CartDetails.First().CartDetailsId = cartDetailsFromDb.CartDetailsId;
                         _context.CartDetails.Update(_mapper.Map<CartDetails>(cartDto.CartDetails.First()));
                         await _context.SaveChangesAsync();
-                    
+
                     }
                 }
                 _response.Result = cartDto;
@@ -164,7 +163,7 @@ namespace Webshop.Services.CartAPI.Controllers
                 CartDetails cartDetails = _context.CartDetails.First(u => u.CartDetailsId == cartDetailsId);
 
                 int totalCountOfCartItem = _context.CartDetails.Where(u => u.CartHeaderId == cartDetails.CartHeaderId).Count();
-                
+
                 _context.CartDetails.Remove(cartDetails);
 
                 if (totalCountOfCartItem == 1)

@@ -10,13 +10,13 @@ namespace Webshop.Services.CouponAPI.Controllers
     [Route("api/coupon")]
 	[ApiController]
 	[Authorize]
-	public class ProductController : ControllerBase
+	public class CouponController : ControllerBase
 	{
 		private readonly ICouponRepository _couponRepo;
 		private readonly IMapper _mapper;
 		private ResponseDto _response;
 
-		public ProductController(ICouponRepository couponRepo, IMapper mapper)
+		public CouponController(ICouponRepository couponRepo, IMapper mapper)
 		{
 			_couponRepo = couponRepo;
 			_mapper = mapper;
@@ -37,7 +37,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 					return _response;
 				}
 
-				_response.Result = _mapper.Map<List<CouponReadDto>>(coupons);
+				_response.Result = _mapper.Map<List<CouponDto>>(coupons);
 				_response.IsSuccess = true;
 			}
 			catch (Exception ex)
@@ -60,7 +60,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 					_response.Message = $"Coupon with id {id} not found.";
 					return _response;
 				}
-				_response.Result = _mapper.Map<CouponReadDto>(coupon);
+				_response.Result = _mapper.Map<CouponDto>(coupon);
 				_response.IsSuccess = true;
 			}
 			catch (Exception ex)
@@ -83,7 +83,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 					_response.Message = $"Coupon with code {code} not found.";
 					return _response;
 				}
-				_response.Result = _mapper.Map<CouponReadDto>(coupon);
+				_response.Result = _mapper.Map<CouponDto>(coupon);
 				_response.IsSuccess = true;
 			}
 			catch (Exception ex)
@@ -97,7 +97,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 
 		[HttpPost]
 		[Authorize(Roles = "ADMIN")]
-		public async Task<ResponseDto> CreateCoupon([FromBody] CouponCreateDto couponDto)
+		public async Task<ResponseDto> CreateCoupon([FromBody] CouponDto couponDto)
 		{
 			try
 			{
@@ -108,9 +108,10 @@ namespace Webshop.Services.CouponAPI.Controllers
 					return _response;
 				}
 
+
 				var coupon = _mapper.Map<Coupon>(couponDto);
 				await _couponRepo.CreateAsync(coupon);
-				_response.Result = _mapper.Map<CouponReadDto>(coupon);
+				_response.Result = _mapper.Map<CouponDto>(coupon);
 				_response.IsSuccess = true;
 			}
 			catch (Exception ex)
@@ -148,7 +149,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 
 		[HttpPut("{id:int}")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<ResponseDto> UpdateCoupon(int id, [FromBody] CouponUpdateDto updateDto)
+        public async Task<ResponseDto> UpdateCoupon(int id, [FromBody] CouponDto updateDto)
 		{
 			try
 			{
@@ -171,7 +172,7 @@ namespace Webshop.Services.CouponAPI.Controllers
 					return _response;
 				}
 
-				_response.Result = _mapper.Map<CouponReadDto>(updatedCoupon);
+				_response.Result = _mapper.Map<CouponDto>(updatedCoupon);
 				_response.IsSuccess = true;
 			}
 			catch (Exception ex)
