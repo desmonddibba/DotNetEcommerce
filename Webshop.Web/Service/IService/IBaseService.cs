@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Webshop.Web.Dtos;
+﻿using Webshop.Web.Models.Dtos;
 
 namespace Webshop.Web.Service.IService
 {

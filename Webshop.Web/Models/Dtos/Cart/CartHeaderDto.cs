@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace Webshop.Web.Models
+﻿namespace Webshop.Web.Models.Dtos.Cart
 {
     public class CartHeaderDto
     {
@@ -10,5 +7,11 @@ namespace Webshop.Web.Models
         public string? CouponCode { get; set; }
         public decimal Discount { get; set; }
         public decimal CartTotal { get; set; }
+
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
+
     }
 }

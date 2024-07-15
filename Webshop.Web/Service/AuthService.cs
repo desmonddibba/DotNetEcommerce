@@ -1,5 +1,5 @@
-﻿using Webshop.Web.Dtos;
-using Webshop.Web.Models;
+﻿using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Authorization;
 using Webshop.Web.Service.IService;
 using Webshop.Web.Utility;
 
@@ -32,7 +32,7 @@ namespace Webshop.Web.Service
                 ApiType = SD.ApiType.POST,
                 Data = loginRequestDto,
                 Url = SD.AuthAPIBase + "/api/auth/login"
-            }, withBearer: false );
+            }, withBearer: false);
         }
 
         public async Task<ResponseDto?> RegisterAsync(RegistrationRequestDto registrationRequestDto)
@@ -43,6 +43,21 @@ namespace Webshop.Web.Service
                 Data = registrationRequestDto,
                 Url = SD.AuthAPIBase + "/api/auth/register"
             }, withBearer: false);
+        }
+
+        Task<ResponseDto?> IAuthService.AssignRoleAsync(RegistrationRequestDto registrationRequestDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ResponseDto?> IAuthService.LoginAsync(LoginRequestDto loginRequestDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ResponseDto?> IAuthService.RegisterAsync(RegistrationRequestDto registrationRequestDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

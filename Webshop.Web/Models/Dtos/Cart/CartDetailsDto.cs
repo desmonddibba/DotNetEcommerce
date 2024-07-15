@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using Webshop.Web.Models.Dtos.Product;
 
-namespace Webshop.Web.Models
+namespace Webshop.Web.Models.Dtos.Cart
 {
     public class CartDetailsDto
     {

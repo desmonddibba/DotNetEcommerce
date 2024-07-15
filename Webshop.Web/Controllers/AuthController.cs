@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Webshop.Web.Dtos;
-using Webshop.Web.Models;
+using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Authorization;
 using Webshop.Web.Service.IService;
 using Webshop.Web.Utility;
 
@@ -134,7 +134,7 @@ namespace Webshop.Web.Controllers
 
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-            
+
         }
     }
 }

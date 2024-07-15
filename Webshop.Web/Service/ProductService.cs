@@ -1,8 +1,7 @@
-﻿using Webshop.Web.Models;
+﻿using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Product;
 using Webshop.Web.Service.IService;
 using Webshop.Web.Utility;
-using Microsoft.Extensions.Logging;
-using Webshop.Web.Dtos;
 
 
 
@@ -11,9 +10,9 @@ namespace Webshop.Web.Service
     public class ProductService : IProductService
     {
         private readonly IBaseService _baseService;
-		private readonly ILogger<ProductService> _logger;
+        private readonly ILogger<ProductService> _logger;
 
-		public ProductService(IBaseService baseService, ILogger<ProductService> logger)
+        public ProductService(IBaseService baseService, ILogger<ProductService> logger)
         {
             _baseService = baseService;
             _logger = logger;
@@ -51,16 +50,16 @@ namespace Webshop.Web.Service
 
         public async Task<ResponseDto?> GetAllProductsAsync()
         {
-			_logger.LogInformation("Fetching all products");
+            _logger.LogInformation("Fetching all products");
 
-		    return await _baseService.SendAsync(new RequestDto()
+            return await _baseService.SendAsync(new RequestDto()
             {
                 ApiType = SD.ApiType.GET,
                 Url = SD.ProductAPIBase + "/api/product"
             });
- 
 
-		}
+
+        }
 
 
         //public async Task<ResponseDto?> GetProduct(string productCode)

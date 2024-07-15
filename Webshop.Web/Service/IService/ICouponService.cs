@@ -1,5 +1,5 @@
-﻿using Webshop.Web.Dtos;
-using Webshop.Web.Models;
+﻿using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Coupon;
 
 namespace Webshop.Web.Service.IService
 {

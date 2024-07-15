@@ -1,4 +1,4 @@
-﻿namespace Webshop.Web.Dtos
+﻿namespace Webshop.Web.Models.Dtos
 {
     public class ResponseDto
     {

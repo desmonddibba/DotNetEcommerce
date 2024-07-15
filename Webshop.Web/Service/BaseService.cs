@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Webshop.Web.Models.Dtos;
 using Webshop.Web.Service.IService;
-using Webshop.Web.Utility;
 using static Webshop.Web.Utility.SD;
-using Webshop.Web.Dtos;
 
 namespace Webshop.Web.Service
 {

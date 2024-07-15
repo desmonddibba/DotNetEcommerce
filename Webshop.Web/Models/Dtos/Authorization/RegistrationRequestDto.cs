@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Webshop.Web.Models
+namespace Webshop.Web.Models.Dtos.Authorization
 {
-	public class RegistrationRequestDto
-	{
-		[Required]
-		public string Email { get; set; }
+    public class RegistrationRequestDto
+    {
+        [Required]
+        public string Email { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

@@ -1,8 +1,7 @@
-﻿using Webshop.Web.Models;
+﻿using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Coupon;
 using Webshop.Web.Service.IService;
 using Webshop.Web.Utility;
-using Microsoft.Extensions.Logging;
-using Webshop.Web.Dtos;
 
 
 namespace Webshop.Web.Service
@@ -10,9 +9,9 @@ namespace Webshop.Web.Service
     public class CouponService : ICouponService
     {
         private readonly IBaseService _baseService;
-		private readonly ILogger<CouponService> _logger;
+        private readonly ILogger<CouponService> _logger;
 
-		public CouponService(IBaseService baseService, ILogger<CouponService> logger)
+        public CouponService(IBaseService baseService, ILogger<CouponService> logger)
         {
             _baseService = baseService;
             _logger = logger;
@@ -50,16 +49,16 @@ namespace Webshop.Web.Service
 
         public async Task<ResponseDto?> GetAllCouponsAsync()
         {
-			_logger.LogInformation("Fetching all coupons");
+            _logger.LogInformation("Fetching all coupons");
 
-		    return await _baseService.SendAsync(new RequestDto()
+            return await _baseService.SendAsync(new RequestDto()
             {
                 ApiType = SD.ApiType.GET,
                 Url = SD.CouponAPIBase + "/api/coupon"
             });
- 
 
-		}
+
+        }
 
 
         public async Task<ResponseDto?> GetCoupon(string couponCode)

@@ -1,6 +1,6 @@
 ﻿using static Webshop.Web.Utility.SD;
 
-namespace Webshop.Web.Dtos
+namespace Webshop.Web.Models.Dtos
 {
     public class RequestDto
     {

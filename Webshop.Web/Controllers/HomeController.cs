@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using Webshop.Web.Dtos;
 using Webshop.Web.Models;
+using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Cart;
+using Webshop.Web.Models.Dtos.Product;
 using Webshop.Web.Service.IService;
 
 namespace Webshop.Web.Controllers
@@ -15,7 +17,7 @@ namespace Webshop.Web.Controllers
         private readonly IProductService _productService;
         private readonly ICartService _cartService;
 
-        public HomeController(ILogger<HomeController> logger, 
+        public HomeController(ILogger<HomeController> logger,
             IProductService productService,
             ICartService cartService)
         {
@@ -88,7 +90,7 @@ namespace Webshop.Web.Controllers
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Item has been added to the Shopping Cart";
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(Index));
             }
             else
             {

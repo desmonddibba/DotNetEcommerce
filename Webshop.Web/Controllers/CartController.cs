@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
-using Webshop.Web.Dtos;
-using Webshop.Web.Models;
+using Webshop.Web.Models.Dtos;
+using Webshop.Web.Models.Dtos.Cart;
 using Webshop.Web.Service.IService;
 
 namespace Webshop.Web.Controllers
@@ -14,7 +14,7 @@ namespace Webshop.Web.Controllers
 
         public CartController(ICartService cartService)
         {
-            _cartService = cartService;   
+            _cartService = cartService;
         }
 
         [Authorize]
@@ -50,6 +50,23 @@ namespace Webshop.Web.Controllers
             return View();
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> EmailCart(CartDto cartDto)
+        {
+            ResponseDto? res = await _cartService.EmailCart(cartDto);
+
+            if (res != null && res.IsSuccess)
+            {
+                TempData["Success"] = "Email will be processed and sent shortly.";
+                return RedirectToAction(nameof(CartIndex));
+            };
+            return View();
+        }
+
+
+
+
         [HttpPost]
         public async Task<IActionResult> RemoveCoupon(CartDto cartDto)
         {
@@ -72,7 +89,7 @@ namespace Webshop.Web.Controllers
             var userId = User.Claims.Where(u => u.Type == JwtRegisteredClaimNames.Sub)?.FirstOrDefault()?.Value;
             ResponseDto res = await _cartService.GetCartByUserIdAsync(userId);
 
-            if(res != null && res.IsSuccess)
+            if (res != null && res.IsSuccess)
             {
                 CartDto cartDto = JsonConvert.DeserializeObject<CartDto>(Convert.ToString(res.Result));
                 return cartDto;
